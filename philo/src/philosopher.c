@@ -21,7 +21,6 @@ int	take_forks(t_philo *philo)
 	{
 		pthread_mutex_lock(philo->left_fork);
 		safe_print(philo, "has taken a fork");
-		precise_sleep(philo->data->time_to_die);
 		pthread_mutex_unlock(philo->left_fork);
 		return (0);
 	}
@@ -48,16 +47,31 @@ void	eat(t_philo *philo)
 	philo->times_eaten++;
 	pthread_mutex_unlock(&philo->data->meal_mutex);
 	precise_sleep(philo->data->time_to_eat);
-	pthread_mutex_unlock(philo->left_fork);
-	pthread_mutex_unlock(philo->right_fork);
+	if (philo->left_fork < philo->right_fork)
+	{
+		pthread_mutex_unlock(philo->left_fork);
+		pthread_mutex_unlock(philo->right_fork);
+	}
+	else
+	{
+		pthread_mutex_unlock(philo->right_fork);
+		pthread_mutex_unlock(philo->left_fork);
+	}
 }
 
 void	think_and_sleep(t_philo *philo)
 {
+	int	adaptive_delay;
+
 	safe_print(philo, "is sleeping");
 	precise_sleep(philo->data->time_to_sleep);
 	safe_print(philo, "is thinking");
-	usleep(1000);
+	adaptive_delay = 1000;
+	if (philo->data->num_philos > 100)
+		adaptive_delay = 2000;
+	else if (philo->data->num_philos > 50)
+		adaptive_delay = 1500;
+	usleep(adaptive_delay);
 }
 
 void	*philosopher_routine(void *arg)

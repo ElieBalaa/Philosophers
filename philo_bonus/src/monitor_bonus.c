@@ -24,14 +24,14 @@ void	*monitor_routine_bonus(void *arg)
 		current_time = get_time_bonus();
 		last_meal = philo->last_meal_time;
 		sem_post(philo->data->meal_sem);
-		if (current_time - last_meal > philo->data->time_to_die)
+		if (current_time - last_meal >= philo->data->time_to_die)
 		{
 			sem_wait(philo->data->print_sem);
 			printf("%ld %d died\n", current_time - philo->data->start_time,
 				philo->id);
 			exit(1);
 		}
-		usleep(100);
+		usleep(50);
 	}
 	return (NULL);
 }

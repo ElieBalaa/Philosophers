@@ -29,7 +29,10 @@ void	precise_sleep_bonus(long time_ms)
 	current = start;
 	while (current - start < time_ms)
 	{
-		usleep(100);
+		if (time_ms - (current - start) > 1)
+			usleep(100);
+		else
+			usleep(10);
 		current = get_time_bonus();
 	}
 }

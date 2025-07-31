@@ -33,10 +33,17 @@ void	eat_bonus(t_philo *philo)
 
 void	think_and_sleep_bonus(t_philo *philo)
 {
+	int	adaptive_delay;
+
 	safe_print_bonus(philo, "is sleeping");
 	precise_sleep_bonus(philo->data->time_to_sleep);
 	safe_print_bonus(philo, "is thinking");
-	usleep(1000);
+	adaptive_delay = 1000;
+	if (philo->data->num_philos > 100)
+		adaptive_delay = 2000;
+	else if (philo->data->num_philos > 50)
+		adaptive_delay = 1500;
+	usleep(adaptive_delay);
 }
 
 void	philosopher_process(t_philo *philo)
