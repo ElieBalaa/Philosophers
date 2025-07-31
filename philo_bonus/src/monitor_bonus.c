@@ -20,6 +20,7 @@ void	*monitor_routine_bonus(void *arg)
 	philo = (t_philo *)arg;
 	while (1)
 	{
+		sem_wait(philo->data->death_sem);
 		sem_wait(philo->data->meal_sem);
 		current_time = get_time_bonus();
 		last_meal = philo->last_meal_time;
@@ -31,6 +32,7 @@ void	*monitor_routine_bonus(void *arg)
 				philo->id);
 			exit(1);
 		}
+		sem_post(philo->data->death_sem);
 		usleep(100);
 	}
 	return (NULL);

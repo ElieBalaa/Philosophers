@@ -22,10 +22,12 @@ void	take_forks_bonus(t_philo *philo)
 void	eat_bonus(t_philo *philo)
 {
 	safe_print_bonus(philo, "is eating");
+	sem_wait(philo->data->death_sem);
 	sem_wait(philo->data->meal_sem);
 	philo->last_meal_time = get_time_bonus();
 	philo->times_eaten++;
 	sem_post(philo->data->meal_sem);
+	sem_post(philo->data->death_sem);
 	precise_sleep_bonus(philo->data->time_to_eat);
 	sem_post(philo->data->forks);
 	sem_post(philo->data->forks);

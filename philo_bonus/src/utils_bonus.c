@@ -42,4 +42,4 @@ void	safe_print_bonus(t_philo *philo, char *msg)
 	timestamp = get_time_bonus() - philo->data->start_time;
 	printf("%ld %d %s\n", timestamp, philo->id, msg);
 	sem_post(philo->data->print_sem);
-} 
+}
