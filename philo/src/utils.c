@@ -15,7 +15,7 @@ long	get_time(void)
 {
 	struct timespec	ts;
 
-	clock_gettime(CLOCK_MONOTONIC, &ts);
+    clock_gettime(CLOCK_MONOTONIC, &ts);
 	return (ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
 }
 
@@ -28,10 +28,7 @@ void	precise_sleep(long time_ms)
 	current = start;
 	while (current - start < time_ms)
 	{
-		if (time_ms - (current - start) > 1)
-			usleep(100);
-		else
-			usleep(10);
+		usleep(100);
 		current = get_time();
 	}
 }

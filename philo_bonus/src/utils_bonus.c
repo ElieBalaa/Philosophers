@@ -29,10 +29,7 @@ void	precise_sleep_bonus(long time_ms)
 	current = start;
 	while (current - start < time_ms)
 	{
-		if (time_ms - (current - start) > 1)
-			usleep(100);
-		else
-			usleep(10);
+		usleep(100);
 		current = get_time_bonus();
 	}
 }
@@ -45,4 +42,4 @@ void	safe_print_bonus(t_philo *philo, char *msg)
 	timestamp = get_time_bonus() - philo->data->start_time;
 	printf("%ld %d %s\n", timestamp, philo->id, msg);
 	sem_post(philo->data->print_sem);
-}
+} 

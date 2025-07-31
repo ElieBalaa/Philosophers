@@ -20,7 +20,7 @@ static int	check_philosopher_death(t_data *data, int i)
 	pthread_mutex_lock(&data->meal_mutex);
 	last_meal = data->philos[i].last_meal_time;
 	pthread_mutex_unlock(&data->meal_mutex);
-	if (current_time - last_meal >= data->time_to_die)
+	if (current_time - last_meal > data->time_to_die)
 	{
 		pthread_mutex_lock(&data->death_mutex);
 		if (!data->dead)
@@ -90,7 +90,7 @@ void	*monitor_routine(void *arg)
 	{
 		if (check_death(data) || check_all_ate(data))
 			break ;
-		usleep(50);
+		usleep(100);
 	}
 	return (NULL);
 }
