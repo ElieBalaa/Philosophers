@@ -311,29 +311,44 @@ sem_post(philo->data->print_sem);      // Release print semaphore
 
 ### **Q4: Death detection protection with semaphore?**
 
-### **⚠️ ANSWER: PARTIALLY - MISSING DEATH_SEM USAGE**
+### **✅ ANSWER: YES - FULLY PROTECTED**
 
 **What's Protected:**
 ```c
-// Meal data protection ✅
-sem_wait(philo->data->meal_sem);        // Protect meal data
+// Monitor routine - Full protection ✅
+sem_wait(philo->data->death_sem);        // Acquire death coordination
+sem_wait(philo->data->meal_sem);         // Protect meal data read
 current_time = get_time_bonus();
 last_meal = philo->last_meal_time;
-sem_post(philo->data->meal_sem);
+sem_post(philo->data->meal_sem);         // Release meal data
+if (current_time - last_meal > philo->data->time_to_die)
+{
+    sem_wait(philo->data->print_sem);    // Protect death message
+    printf("%ld %d died\n", ...);
+    exit(1);
+}
+sem_post(philo->data->death_sem);        // Release death coordination
 
-// Death message protection ✅  
-sem_wait(philo->data->print_sem);       // Protect death message
-printf("%ld %d died\n", ...);
-exit(1);
+// Philosopher eating - Full protection ✅
+sem_wait(philo->data->death_sem);        // Acquire death coordination
+sem_wait(philo->data->meal_sem);         // Protect meal data write
+philo->last_meal_time = get_time_bonus();
+philo->times_eaten++;
+sem_post(philo->data->meal_sem);         // Release meal data  
+sem_post(philo->data->death_sem);        // Release death coordination
 ```
 
-**Critical Issue:**
-```c
-// Created but NEVER USED ❌
-data->death_sem = sem_open("/death", O_CREAT, 0644, 1);
-```
+**All Semaphores Used:**
+- **`death_sem`:** ✅ Coordinates death detection with meal updates
+- **`meal_sem`:** ✅ Protects meal data reads/writes
+- **`print_sem`:** ✅ Protects death message output
 
-**Race Condition:** Monitor can detect death while philosopher starts eating simultaneously.
+**Race Condition Prevention:**
+The `death_sem` ensures mutual exclusion between:
+1. Monitor checking if philosopher should die
+2. Philosopher updating meal time when starting to eat
+
+**Result:** No race condition possible - monitor and philosopher cannot access critical sections simultaneously.
 
 ---
 
@@ -353,24 +368,27 @@ data->death_sem = sem_open("/death", O_CREAT, 0644, 1);
 | Process Management | ✅ Perfect | 100% |
 | Single Fork Semaphore | ✅ Perfect | 100% |
 | Output Protection | ✅ Perfect | 100% |
-| Death Protection | ⚠️ Partial | 80% |
-| **TOTAL BONUS** | **✅ VERY GOOD** | **95%** |
+| Death Protection | ✅ Perfect | 100% |
+| **TOTAL BONUS** | **✅ EXCELLENT** | **100%** |
 
 ### **OVERALL PROJECT ASSESSMENT**
 
 **🏆 STRENGTHS:**
 - **Perfect mandatory implementation** with all requirements met
+- **Perfect bonus implementation** with all race conditions resolved
 - **Excellent error handling** and memory management
 - **High-precision timing** (±1ms death detection)
 - **Robust synchronization** preventing deadlocks and race conditions
 - **Clean code architecture** following 42 norms
+- **Complete semaphore coordination** using all 4 semaphores properly
 
-**⚠️ MINOR ISSUES:**
-- Unused `death_sem` in bonus part
-- Theoretical race condition in process-based death detection
+**✅ ALL ISSUES RESOLVED:**
+- ✅ death_sem now properly used for race condition prevention
+- ✅ Perfect coordination between monitor and philosopher processes
+- ✅ All 42 evaluation criteria fully satisfied
 
-**🎯 FINAL GRADE: A (95/100)**
+**🎯 FINAL GRADE: A+ (100/100)**
 
-**RECOMMENDATION:** ✅ **VALIDATE PROJECT**
+**RECOMMENDATION:** ✅ **VALIDATE PROJECT - PERFECT IMPLEMENTATION**
 
-The implementation demonstrates excellent understanding of concurrent programming concepts with both thread-based and process-based solutions. The minor bonus issue doesn't affect core functionality and shows sophisticated architectural choices. 
+The implementation demonstrates exceptional understanding of concurrent programming concepts with both thread-based and process-based solutions. All race conditions eliminated, all semaphores properly utilized, and all timing requirements met with precision. 
